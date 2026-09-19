@@ -1,0 +1,303 @@
+<!<!DOCTYPE html>
+<超文本标记语言 语言="zh-CN">
+<头>
+  <元数据 字符集="UTF-8">
+  <元数据 名字="viewport" 内容=宽度=设备宽度，初始缩放比例=1.0>
+  <标题>测人名</标题>
+  <风格>
+    * {
+      边缘: 0;
+      衬垫: 0;
+      box-sizing: border-box;
+    }
+
+    身体 {
+      背景: #fff;
+      颜色: #000;
+      font-family: -apple-system, Blink Mac 系统字体, “平方SC”, "Helvetica Neue", sans-serif;
+      min-height: 100“vh” 这个词组没有明确;
+      显示: 屈伸;
+      flex-direction: 柱;
+      align-items: 中心;
+      justify-content: 中心;
+      衬垫: 24小卖部;
+      溢出: 隐藏的;
+    }
+
+    /* 大标题 */
+    .标题 {
+      font-size: 42小卖部;
+      font-weight: 800;
+      letter-spacing: 4小卖部;
+      margin-bottom: 50小卖部;
+      text-align: 中心;
+      颜色: #000;
+    }
+
+    /* 输入区 */
+    .input-area {
+      显示: 屈伸;
+      flex-direction: 柱;
+      align-items: 中心;
+      差距: 18小卖部;
+      宽度: 100%;
+      max-width: 320小卖部;
+    }
+
+    .input-area 输入 {
+      宽度: 100%;
+      font-size: 20小卖部;
+      衬垫: 14小卖部 18小卖部;
+      边界: 2小卖部 固体 #000;
+      border-radius: 12小卖部;
+      轮廓线: 没有一个;
+      text-align: 中心;
+      font-family: 继承;
+      背景: #fff;
+      颜色: #000;
+    }
+
+    .input-area 输入:焦点 {
+      border-color: #4f46e5;
+    }
+
+    .input-area 按钮 {
+      宽度: 100%;
+      衬垫: 14小卖部;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: #000;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    .input-area button:hover {
+      background: #333;
+    }
+
+    .input-area button:active {
+      transform: scale(0.97);
+    }
+
+    /* 思考动画 */
+    .thinking {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .thinking.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 56px;
+      height: 56px;
+      border: 5px solid #eee;
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .thinking-text {
+      font-size: 16px;
+      color: #888;
+      letter-spacing: 2px;
+    }
+
+    /* 结果区 */
+    .result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .result.show {
+      display: flex;
+    }
+
+    .result-name {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: #000;
+      text-align: center;
+      animation: popIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      z-index: 2;
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      70% {
+        transform: scale(1.15);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* 烟花层 */
+    .fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .firework-block {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      animation: explode 1.6s ease-out forwards;
+    }
+
+    @keyframes explode {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0.2);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 输入区 -->
+  <div id="inputStage">
+    <h1 class="title">测人名</h1>
+    <div class="input-area">
+      <input type="text" id="nameInput" placeholder="请输入您的姓名" autocomplete="off" />
+      <button onclick="startThinking()">开始测试</button>
+    </div>
+  </div>
+
+  <!-- 思考区 -->
+  <div class="thinking" id="thinkingStage">
+    <div class="spinner"></div>
+    <div class="thinking-text">正在思考...</div>
+  </div>
+
+  <!-- 结果区 -->
+  <div class="result" id="resultStage">
+    <div class="result-name" id="resultName">XXX！</div>
+  </div>
+
+  <!-- 烟花层 -->
+  <div class="fireworks" id="fireworks"></div>
+
+<script>
+  const inputStage = document.getElementById('inputStage');
+  const thinkingStage = document.getElementById('thinkingStage');
+  const resultStage = document.getElementById('resultStage');
+  const resultName = document.getElementById('resultName');
+  const nameInput = document.getElementById('nameInput');
+  const fireworksLayer = document.getElementById('fireworks');
+
+  // 彩色方块颜色
+  const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3',
+                  '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0',
+                  '#ff9f43', '#10ac84', '#ee5253', '#0abde3'];
+
+  // 支持回车
+  nameInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') startThinking();
+  });
+
+  function startThinking() {
+    const name = nameInput.value.trim();
+    if (!name) {
+      nameInput.focus();
+      return;
+    }
+
+    // 隐藏输入，显示思考
+    inputStage.style.display = 'none';
+    thinkingStage.classList.add('show');
+
+    // 思考 1.8 秒后显示结果
+    setTimeout(() => {
+      thinkingStage.classList.remove('show');
+      showResult(name);
+    }, 1800);
+  }
+
+  function showResult(name) {
+    resultName.textContent = name + '！';
+    resultStage.classList.add('show');
+
+    // 放烟花
+    launchFireworks();
+
+    // 多放几波
+    setTimeout(launchFireworks, 400);
+    setTimeout(launchFireworks, 800);
+  }
+
+  function launchFireworks() {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    const count = 30 + Math.floor(Math.random() * 15);
+
+    for (let i = 0; i < count; i++) {
+      const block = document.createElement('div');
+      block.className = 'firework-block';
+
+      // 随机颜色
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      block.style.background = color;
+
+      // 起始位置：屏幕中心随机偏移
+      const startX = centerX + (Math.random() - 0.5) * 100;
+      const startY = centerY + (Math.random() - 0.5) * 100;
+
+      block.style.left = startX + 'px';
+      block.style.top = startY + 'px';
+
+      // 随机大小
+      const size = 8 + Math.random() * 8;
+      block.style.width = size + 'px';
+      block.style.height = size + 'px';
+
+      // 爆炸方向
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 100 + Math.random() * 180;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+
+      block.style.setProperty('--tx', tx + 'px');
+      block.style.setProperty('--ty', ty + 'px');
+
+      fireworksLayer.appendChild(block);
+
+      // 动画结束后移除
+      setTimeout(() => block.remove(), 1700);
+    }
+  }
+</script>
+
+</body>
+  </html>
